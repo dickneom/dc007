@@ -2,7 +2,7 @@ extends ../layout
 include ../mixins
 
 block content
-  +menu_guest
+  +menu(null)
 
   if (sessionUser.nickname)
     h4= sessionUser.nickname

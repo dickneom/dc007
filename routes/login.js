@@ -26,12 +26,13 @@ router.post('/', function (req, res, next) {
   }).then(function (user) {
     if (user) {
       if (user.authenticated) {
-        console.log('****** Usuario validado y autentidado')
+        console.log('(LOGIN.JS) ****** Usuario validado y autentidado')
         req.session.userLoged = {
           id: user.id,
           nickname: user.nickname,
           fullname: user.fullname,
-          email: user.email
+          email: user.email,
+          isAdmin: user.isAdmin
         }
         console.log('****** Redirecsionando a: ' + req.session.urlGet)
         if (req.session.urlGet) {

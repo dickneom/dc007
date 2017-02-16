@@ -1,0 +1,16 @@
+extends ../layout
+include ../mixins
+
+block content
+  +menu(null)
+
+  a(href='/users') Regresar a usuarios
+
+  p= user.id
+  p= user.nickname
+  p= user.fullname
+  p= user.email
+  p= user.authenticated
+  p= user.isAdmin
+
+  +foot

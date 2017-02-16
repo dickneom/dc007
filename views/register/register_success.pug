@@ -2,7 +2,7 @@ extends ../layout
 include ../mixins
 
 block content
-  +menu_guest
+  +menu(null)
   if user.nickname
     h1 Bienvenido a DressCloset #{user.nickname}
   else
@@ -18,7 +18,7 @@ block content
   p: a(href=tempMessage) Link en el email (Autenticar)
   hr
   //- Hasta aqui
-  
+
   +foot
 
 

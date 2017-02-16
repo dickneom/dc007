@@ -1,0 +1,16 @@
+extends ../layout
+include ../mixins
+
+block content
+  +menu(null)
+
+  form(method='post' action='/users/update')
+    +input_readonly('Id Usuario', 'text', 'userId', '', errors)
+    br
+    +input_required('Alias', 'text', 'nickname', user.nickname, errors)
+    br
+    +input_required('Email', 'email', 'email', user.email, errors)
+    br
+    button(type='submit') Grabar
+
+  +foot
