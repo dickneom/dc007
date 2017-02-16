@@ -52,7 +52,7 @@ block content
 							button(type='submit') Grabar
 
 					else
-						form(method='post' action='/dresses/create' enctype='multipart/form-data')
+						form(method='post' action='/dresses/create')
 							+input_readonly('ID vestido', 'text', 'dressId', '', null)
 							br
 							+input_required('Titulo', 'text', 'title', null, null)

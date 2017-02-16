@@ -23,9 +23,10 @@ block content
 						p Marca: #{brand}
 						p Estado: #{state}
 
-						a(href='/dresses/' + dress.id + '/like'): button(type='button') Agregar Favorito
-						a(href='/dresses/' + dress.id + '/edit'): button(type='button') Editar
-						a(href='/dresses/' + dress.id + '/buy'): button(type='button') Comprar
+						if sessionUser
+							a(href='/dresses/' + dress.id + '/like'): button(type='button') Agregar Favorito
+							a(href='/dresses/' + dress.id + '/buy'): button(type='button') Comprar
+							a(href='/dresses/' + dress.id + '/edit'): button(type='button') Editar
 				.row
 					div(style='background:rgb(255,180,180)').row
 						.col-sm-3

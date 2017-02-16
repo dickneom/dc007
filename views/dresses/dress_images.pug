@@ -19,11 +19,14 @@ block content
 				.row
 					if (dress)
 						form(method='post' action='/dresses/images' enctype='multipart/form-data')
-							+input_readonly('ID vestido', 'text', 'dresId', dress.id, null)
+							+input_readonly('ID vestido', 'text', 'dressId', dress.id, null)
 							br
 							img(src=imageUrl width=150 height=200 alt='Vestido')
 							input(type='file'  name='image')
-							button(type='submit') Subir imagen
+							if (imageUrl)
+								button(type='submit') Cambiar imagen
+							else
+								button(type='submit') Subir imagen
 
 			.col-sm-3
 				p Publicidad

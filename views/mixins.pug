@@ -139,12 +139,9 @@ mixin input(title, type, field, value, errors)
   +input_error(errors, field)
 
 mixin input_readonly(title, type, field, value, errors)
-  label(for=field)= title
-  //if value
+  if (type !== 'hidden')
+    label(for=field)= title
   input(type=type name=field value=value placeholder='Con datos' readonly)
-  //else
-    //input(type=type name=field placeholder='Vacio')
-  //+input_error(errors, field)
 
 mixin input_required(title, type, field, value, errors)
   label(for=field)= title
@@ -165,7 +162,7 @@ mixin input_error(errors, field)
 //-   Requiere:
 //-     dresses:  lista de vestidos
 //-     pageName: nombre de la pagina desde la que se muestra
-mixin dresses_grid(dresses)
+mixin dresses_grid(dresses, numCols)
   .row
     each dress in dresses
       if (dress)
@@ -184,10 +181,20 @@ mixin dresses_grid(dresses)
             a(href='/dresses/' + dress.id + '/update'): button(type='button') Editar
             a(href='/dresses/' + dress.id + '/images'): button(type='button') Imagenes
             if dress.stateId === 1
-              a(href='/dresses/' + dress.id + '/publish'): button(type='button') Publicar
+              //- a(href='/dresses/' + dress.id + '/publish'): button(type='button') Publicar
+              form(method='post' action='/dresses/publish')
+                +input_readonly('ID vestido', 'hidden', 'dressId', dress.id, null)
+                button(type='submit') Publicar
+            if dress.stateId !== 1
+              //- a(href='/dresses/' + dress.id + '/publish'): button(type='button') Publicar
+              form(method='post' action='/dresses/publish')
+                +input_readonly('ID vestido', 'hidden', 'dressId', dress.id, null)
+                button(type='submit') Retirar
           if (pageName === 'dresses')
             a(href='/dresses/' + dress.id + '/like'): button(type='button') Agregar Favorito
             a(href='/dresses/' + dress.id + '/buy'): button(type='button') Comprar
           if (dress.stateId === 2)
-            a(href='/dresses/' + dress.id + '/publish_acept'): button(type='button') En venta
-            a(href='/dresses/' + dress.id + '/publish_reject'): button(type='button') No en venta
+            //- a(href='/dresses/' + dress.id + '/publish'): button(type='button') Publicar
+            form(method='post' action='/dresses/for_sale')
+              +input_readonly('ID vestido', 'hidden', 'dressId', dress.id, null)
+              button(type='submit') En venta

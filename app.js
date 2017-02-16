@@ -8,6 +8,9 @@ var expressSession = require('express-session')
 
 var index = require('./routes/index')
 var login = require('./routes/login')
+var logout = require('./routes/logout')
+var register = require('./routes/register')
+var passRecover = require('./routes/pass_recover')
 var dresses = require('./routes/dresses')
 var users = require('./routes/users')
 
@@ -39,6 +42,9 @@ app.use(express.static(path.join(__dirname, 'bower_components')))
 
 app.use('/', index)
 app.use('/login', login)
+app.use('/logout', logout)
+app.use('/register', register)
+app.use('/pass_recover', passRecover)
 app.use('/dresses', dresses)
 app.use('/users', users)
 
