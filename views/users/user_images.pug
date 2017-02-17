@@ -1,0 +1,22 @@
+extends ../layout
+include ../mixins
+
+block content
+	+menu(null)
+
+	h1 Agregar foto de un usuario
+
+	if user
+		form(method='post' action='/users/images' enctype='multipart/form-data')
+			+input_readonly('ID usuario', 'text', 'userId', user.id, null)
+			br
+			img(src=imageUrl width=150 height=200 alt='Foto')
+			input(type='file'  name='image')
+			if (imageUrl)
+				button(type='submit') Cambiar imagen
+			else
+				button(type='submit') Subir imagen
+	else
+		h2 No hay ningun usuario
+
+	+foot

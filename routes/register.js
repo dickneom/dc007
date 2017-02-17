@@ -2,7 +2,8 @@ var express = require('express')
 var router = express.Router()
 
 var db = require('../models/db')     // ESTO NO DEBE ESTAR AQUI
-var control = require('../controllers/control')
+var session = require('../controllers/session')
+var email = require('../controllers/email')
 
 router.route('/')
 	.get(function (req, res, next) {
@@ -32,7 +33,7 @@ router.route('/')
 			user.password = null
 			clavesIguales = false
 		} else {
-			user.password = control.encryptPassword(user.password)
+			user.password = session.encryptPassword(user.password)
 		}
 
 		user.createdAt = new Date()
@@ -46,9 +47,9 @@ router.route('/')
 			var date = new Date().getTime()
 			var message = userNew.id + ',' + date
 			console.log('********* Email message: ' + message)
-			message = '/register/' + control.encryptEmail(message)
+			message = '/register/' + email.encryptEmail(message)
 
-			control.sendEmail(userNew.email, message)
+			email.sendEmail(userNew.email, message)
 			//
 			// ENVIAR EMAIL
 			// EN MENSAJE CONTIENE LOS DATOS: ID DEL USUARIO, FECHA Y HORA DE ENVIO
@@ -88,7 +89,7 @@ router.get('/:verif', function (req, res) {
 	var code = req.params.verif
 
 	if (code) {
-		code = control.decryptEmail(code)
+		code = email.decryptEmail(code)
 		var datos = code.split(',')
 		var userId = datos[0]
 		var date = new Date(parseInt(datos[1]))
@@ -107,7 +108,7 @@ router.get('/:verif', function (req, res) {
 					user.update({authenticated: true})
 					.then(function (userNew) {
 						console.log('********* Actualizado: ' + userNew.id)
-						control.sessionInit(req, res, userNew)
+						session.sessionInit(req, res, userNew)
 						res.render('register/register_verified', {
 							pageTitle: 'Registro Verificado',
 							pageName: 'register_verified',

@@ -2,11 +2,12 @@ var express = require('express')
 var router = express.Router()
 
 var db = require('../models/db')
-var control = require('../controllers/control')
+var session = require('../controllers/session')
+var gEmail = require('../controllers/email')
 
 router.route('/')
 	.get(function (req, res, next) {
-		console.log('*************** Atendiendo la ruta: /pass_recover GET')
+		console.log('(PASS_RECOVER.JS) *************** Atendiendo la ruta: /pass_recover GET')
 		res.render('pass_recover/pass_recover', {
 			pageTitle: 'Recuperar contraseña',
 			pageName: 'pass_recover',
@@ -15,7 +16,7 @@ router.route('/')
 		})
 	})
 	.post(function (req, res, next) {
-		console.log('*************** Atendiendo la ruta: /pass_recover POST')
+		console.log('(PASS_RECOVER.JS) *************** Atendiendo la ruta: /pass_recover POST')
 		var email = req.body.email
 
 		if (email && email.length > 0)
@@ -31,12 +32,12 @@ router.route('/')
                 	var date = new Date().getTime()
                 	var message = user.id + ',' + date
                 	console.log('*** MENSAJE: ' + message)
-                	var message = '/pass_recover/change/' + control.encryptEmail(message)
+                	var message = '/pass_recover/change/' + gEmail.encryptEmail(message)
 	                //
 	                //  SE DEBE ENVIAR UN CODIGO ESPECIAL
 	                //  ENVIAR EMAIL, CON UN ENLACE QUE CADUCA
 	                //
-	                control.sendEmail(email, message)
+	                gEmail.sendEmail(email, message)
 	                res.render('pass_recover/pass_recover_email', {
 	                    pageTitle: 'Recuperar contraseña',
 	                    pageName: 'pass_recover_email',
@@ -73,11 +74,11 @@ router.route('/')
 
 router.route('/change/:code')
 	.get(function (req, res, next) {
-		console.log('*************** Atendiendo la ruta: /pass_recover/change/:code GET')
+		console.log('(PASS_RECOVER.JS) *************** Atendiendo la ruta: /pass_recover/change/:code GET')
 		var code = req.params.code
 
 		if (code) {
-			code = control.decryptEmail(code)
+			code = gEmail.decryptEmail(code)
 			var datos = code.split(',')
 			var userId = datos[0]
 			var date = new Date(parseInt(datos[1]))
@@ -134,7 +135,7 @@ router.route('/change/:code')
 
 router.route('/change')
 	.post(function (req, res, next) {
-		console.log('*************** Atendiendo la ruta: /pass_recover/change POST')
+		console.log('(PASS_RECOVER.JS) *************** Atendiendo la ruta: /pass_recover/change POST')
 	    var password = req.body.password
 	    var password1 = req.body.password1
 	    var userId = req.body.id
@@ -148,10 +149,10 @@ router.route('/change')
 	            console.log('****** Actualizando password de: ' + user.nickname)
 	            if (user) {
 //		            if (user.authenticated) {
-		                var pass = control.encryptPassword(password)
+		                var pass = session.encryptPassword(password)
 		                user.update({password: pass})
 		                .then(function (user) {
-		                    control.sessionInit(req, res, user)
+		                    session.sessionInit(req, res, user)
 		                    res.render('pass_recover/pass_recover_success', {
 		                        pageTitle: 'Recuperacion de contraseña exitosa',
 		                        pageName: 'pass_recover_success',

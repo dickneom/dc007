@@ -14,7 +14,8 @@ cloudinary.config({
 })
 
 var db = require('../models/db')
-var control = require('../controllers/control')
+var session = require('../controllers/session')
+var dresses = require('../controllers/dresses')
 
 router.use(function (req, res, next) {
   console.log('****** (global dresses) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
@@ -145,7 +146,7 @@ router.get('/:dressId([0-9]+)', function (req, res, next) {
 // RUTAS PARA PROPIETARIOS
 
 // Lista de vestidos para usuarios registrados
-router.get('/mycloset', control.sessionValidate, function (req, res, next) {
+router.get('/mycloset', session.sessionValidate, function (req, res, next) {
   console.log('*** ATENDIENDO LA RUTA: /dresses/mycloset GET')
 
   var limit = NUM_DRESSES_FOR_PAGE
@@ -189,7 +190,7 @@ router.get('/mycloset', control.sessionValidate, function (req, res, next) {
 })
 
 // Actualizar un vestido por el propietario
-router.get('/:dressId/update', control.sessionValidate, control.isDressOwner, function (req, res, next) {
+router.get('/:dressId/update', session.sessionValidate, dresses.isDressOwner, function (req, res, next) {
   console.log('*** ATENDIENDO LA RUTA: /dresses/:dressId/update GET')
 
   var dressId = req.params.dressId
@@ -216,7 +217,7 @@ router.get('/:dressId/update', control.sessionValidate, control.isDressOwner, fu
 })
 
 // Actualizar un vestido por el propietario
-router.post('/update', control.sessionValidate, control.isDressOwner, function (req, res, next) {
+router.post('/update', session.sessionValidate, dresses.isDressOwner, function (req, res, next) {
   console.log('*** ATENDIENDO LA RUTA: /dresses/:dressId/update POST')
 
   var dressId = req.body.dressId
@@ -264,7 +265,7 @@ router.post('/update', control.sessionValidate, control.isDressOwner, function (
 })
 
 // Agregar un vestido, por un usuario
-router.get('/create', control.sessionValidate, function (req, res, next) {
+router.get('/create', session.sessionValidate, function (req, res, next) {
   console.log('*** ATENDIENDO LA RUTA: /dresses/create GET')
   res.render('dresses/dress_create', {
     pageTitle: 'Agregar vestido',
@@ -278,7 +279,7 @@ router.get('/create', control.sessionValidate, function (req, res, next) {
 })
 
 // Agregar un vestido, por un usuario
-router.post('/create', control.sessionValidate, function (req, res, next) {
+router.post('/create', session.sessionValidate, function (req, res, next) {
   console.log('*** ATENDIENDO LA RUTA: /dresses/create POST')
 
   var dress = {}
@@ -316,7 +317,7 @@ router.post('/create', control.sessionValidate, function (req, res, next) {
 })
 
 // Cargar imagen de un vestido, por el propietario
-router.get('/:dressId/images', control.sessionValidate, control.isDressOwner, function (req, res, next) {
+router.get('/:dressId/images', session.sessionValidate, dresses.isDressOwner, function (req, res, next) {
   console.log('*** ATENDIENDO LA RUTA: /dresses/:dressId/images GET')
 
   var dressId = req.params.dressId
@@ -342,7 +343,7 @@ router.get('/:dressId/images', control.sessionValidate, control.isDressOwner, fu
 })
 
 // Cargar imagen de un vestido, por el propietario
-router.post('/images', control.sessionValidate, uploader.single('image'), control.isDressOwner, function (req, res, next) {
+router.post('/images', session.sessionValidate, uploader.single('image'), dresses.isDressOwner, function (req, res, next) {
   console.log('*** ATENDIENDO LA RUTA: /dresses/:dressId/images POST')
 
   if (req.file) {
@@ -389,7 +390,7 @@ router.post('/images', control.sessionValidate, uploader.single('image'), contro
 })
 
 // Publicar o retirar un vestido, por el propietario
-router.post('/publish', control.sessionValidate, control.isDressOwner, function (req, res, next) {
+router.post('/publish', session.sessionValidate, dresses.isDressOwner, function (req, res, next) {
   console.log('*** ATENDIENDO LA RUTA: /dresses/:dressId/publish GET')
 
   var dressId = req.body.dressId
