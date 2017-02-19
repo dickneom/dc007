@@ -9,6 +9,10 @@ block content
     br
     +input_required('Alias', 'text', 'nickname', user.nickname, errors)
     br
+    +input_required('Nombre', 'text', 'firstname', user.firstname, errors)
+    br
+    +input_required('Apellido', 'text', 'lastname', user.lastname, errors)
+    br
     +input_required('Email', 'email', 'email', user.email, errors)
     br
     button(type='submit') Grabar

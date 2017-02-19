@@ -1,0 +1,30 @@
+extends ../layout
+include ../mixins
+
+block content
+  if sessionUser
+    if sessionUser.nickname
+      +menu(sessionUser.nickname)
+    else
+      +menu(sessionUser.fullname)
+  else
+    +menu(null)
+
+  h1 Mensajes
+
+  if messages
+    each mess in messages
+      if !mess.isRead
+        p.strong
+          | #{mess.date}
+          |  - #{mess.subject}
+          |  - #{mess.text}
+      else
+        p
+          | #{mess.date}
+          |  - #{mess.subject}
+          |  - #{mess.text}
+
+      a(href='/messages/' + mess.id) Ver
+
+  +foot

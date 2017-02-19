@@ -50,6 +50,16 @@ block content
 							+input_readonly('ID propietario', 'text', 'userId', dress.user.id, null)
 							br
 							button(type='submit') Grabar
+							if (sessionUser.isAdmin)
+								br
+								Poner en venta
+								br
+								form(method='post' action='/dresses/forSaleAcept')
+									+input_readonly('ID vestido', 'text', 'dressId', dress.id, null)
+									button(type='submit') Aceptado
+								form(method='post' action='/dresses/forSaleReject')
+									+input_readonly('ID vestido', 'text', 'dressId', dress.id, null)
+									button(type='submit') Rechazado
 					else
 						h1.error No hay vestido a editar
 

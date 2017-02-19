@@ -9,9 +9,7 @@ block content
       +menu(sessionUser.fullname)
   else
     +menu(null)
-  
-  .row
-    a(href='/users') Regresar a usuarios
+
   .row
     .col-sm-4
       img(src=user.picture width=180 height=300 alt=user.picture)
@@ -23,5 +21,10 @@ block content
       p= user.email
       p= user.authenticated
       p= user.isAdmin
+  .row
+    a(href='#') Cambiar foto
+    a(href='#') Cambiar clave
+    a(href='#') Editar datos
+
 
   +foot

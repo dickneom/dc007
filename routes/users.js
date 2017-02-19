@@ -1,7 +1,20 @@
-var express = require('express');
-var router = express.Router();
+var express = require('express')
+var router = express.Router()
+
+// PARA SUBIR LAS IMAGENES A CLOUDINARY
+var cloudinary = require('cloudinary')  // sitio web para almacenar imagenes
+var multer = require('multer')   // Para subir archivo (imagenes)
+var uploader = multer({dest: './uploads'})
+
+// configuracion de cloudinary para dresscloset
+cloudinary.config({
+  cloud_name: 'cloud-dc',
+  api_key: '315662672528822',
+  api_secret: 'HaVwA3NVQfm5cVMeTKYU3O5Di7s'
+})
 
 var db = require('../models/db')
+var session = require('../controllers/session')
 
 router.use(function (req, res, next) {
   console.log('(USERS.JS) (global) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
@@ -21,10 +34,12 @@ router.get('/', function (req, res, next) {
   var limit = 10
   var page = 1
   var offset
-  if (req.query.limit)
+  if (req.query.limit) {
     limit = req.query.limit
-  if (req.query.page)
+  }
+  if (req.query.page) {
     page = req.query.page
+  }
   offset = limit * (page - 1)
   db.User.findAll({
     limit: limit,
@@ -50,6 +65,33 @@ router.get('/', function (req, res, next) {
   })
 })
 
+// ver los datos de un usuario, para propietario
+router.get('/profile', session.sessionValidate, function (req, res, next) {
+  console.log('(USERS.JS) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
+  var userId = req.session.userLoged.id
+
+  db.User.findOne({
+    where: {
+      id: userId
+    }
+  }).then(function (user) {
+    var userLoged = null
+    if (req.session.userLoged) {
+      userLoged = req.session.userLoged
+    }
+
+    res.render('users/user_profile', {
+      pageTitle: 'Perfil: ' + user.nickname,
+      pageName: 'user_profile',
+      sessionUser: userLoged,
+      errors: null,
+      user: user
+    })
+  }).catch(function (errors) {
+    res.send('(USERS.JS) Error en la busqueda ' + userId)
+  })
+})
+
 // ver los datos de un usuario, para propietario y administradores
 router.get('/:userId([0-9]+)', function (req, res, next) {
   console.log('(USERS.JS) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
@@ -61,8 +103,9 @@ router.get('/:userId([0-9]+)', function (req, res, next) {
     }
   }).then(function (user) {
     var userLoged = null
-    if (req.session.userLoged)
+    if (req.session.userLoged) {
       userLoged = req.session.userLoged
+    }
 
     res.render('users/user_view', {
       pageTitle: 'Datos usuario: ' + user.nickname,
@@ -71,13 +114,13 @@ router.get('/:userId([0-9]+)', function (req, res, next) {
       errors: null,
       user: user
     })
-  }).catch(function (errors){
+  }).catch(function (errors) {
     res.send('(USERS.JS) Error en la busqueda ' + userId)
   })
 })
 
 // Actuzalizar los datos de un usuario, para propietario y administradores
-router.get('/:userId/update', function (req, res, next) {
+router.get('/:userId([0-9]+)/update', function (req, res, next) {
   console.log('(USERS.JS) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
   var userId = req.params.userId
 
@@ -86,13 +129,17 @@ router.get('/:userId/update', function (req, res, next) {
       id: userId
     }
   }).then(function (user) {
-    var userLoged = null
-    if (req.session.userLoged)
-      userLoged = req.session.userLoged
+    // var fileSecureUrl = result.secure_url
+    console.log('********* Vestido a grabar: ' + user)
 
-    res.render('users/user_view', {
+    var userLoged = null
+    if (req.session.userLoged) {
+      userLoged = req.session.userLoged
+    }
+
+    res.render('users/user_update', {
       pageTitle: 'Datos usuario: ' + user.nickname,
-      pageName: 'user_view',
+      pageName: 'user_update',
       sessionUser: userLoged,
       errors: null,
       user: user
@@ -114,17 +161,23 @@ router.post('/update', function (req, res, next) {
     }
   }).then(function (user) {
     user.nickname = req.body.nickname
+    user.fistname = req.body.firstname
+    user.lastname = req.bocy.lastname
     user.email = req.body.email
 
+    var userLoged = null
+    if (req.session.userLoged) {
+      userLoged = req.session.userLoged
+    }
     user.save().then(function (userNew) {
       res.render('users/user_view', {
-        pageTitle: 'Datos usuario: ' + user.nickname,
+        pageTitle: 'Datos usuario: ' + userNew.nickname,
         pageName: 'user_view',
         sessionUser: userLoged,
-        errors: errors,
+        errors: null,
         user: userNew
       })
-    }).catch( function (errors) {
+    }).catch(function (errors) {
       res.render('users/user_view', {
         pageTitle: 'Datos usuario: ' + user.nickname,
         pageName: 'user_view',
@@ -134,12 +187,12 @@ router.post('/update', function (req, res, next) {
       })
     })
   }).catch(function (errors) {
-    res.send('(USERS.JS) Error en la busqueda del usuario')
+    res.send('(USERS.JS) Error en la busqueda del usuario' + errors)
   })
 })
 
 // Subir la imagen de un usuario, para propietarios
-router.get('/:userId/images', function (req, res, next) {
+router.get('/:userId([0-9]+)/images', function (req, res, next) {
   console.log('(USERS.JS) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
   var userId = req.params.userId
 
@@ -148,16 +201,21 @@ router.get('/:userId/images', function (req, res, next) {
       id: userId
     }
   }).then(function (user) {
+    // var fileSecureUrl = result.secure_url
+    console.log('********* Vestido a grabar: ' + user)
+
     var userLoged = null
-    if (req.session.userLoged)
+    if (req.session.userLoged) {
       userLoged = req.session.userLoged
+    }
 
     res.render('users/user_images', {
       pageTitle: 'Foto de: ' + user.nickname,
-      pageName: 'user_view',
+      pageName: 'user_images',
       sessionUser: userLoged,
       errors: null,
-      user: user
+      user: user,
+      imageUrl: user.picture
     })
   }).catch(function (errors) {
     res.send('(USERS.JS) Error en la busqueda ' + userId)
@@ -165,16 +223,85 @@ router.get('/:userId/images', function (req, res, next) {
 })
 
 // subir la imagen de un usuario, para propietarios
-router.post('/images', function (req, res, next) {
+router.post('/images', uploader.single('image'), function (req, res, next) {
   console.log('(USERS.JS) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
 
+  var userId = req.body.userId
 
+  db.User.findOne({
+    where: {
+      id: userId
+    }
+  }).then(function (user) {
+    cloudinary.uṕloader.upload(req.file.path, function (result) {
+      user.picture = result.url
+      console.log('********* Vestido a grabar: ' + user.picture)
+
+      var userLoged = null
+      if (req.session.userLoged) {
+        userLoged = req.session.userLoged
+      }
+      user.save().then(function (userNew) {
+        res.render('users/user_images', {
+          pageTitle: 'Foto de: ' + user.nickname,
+          pageName: 'user_view',
+          sessionUser: userLoged,
+          errors: null,
+          user: user,
+          imageUrl: user.picture
+        })
+      }).catch(function (errors) {
+        res.render('users/user_view', {
+          pageTitle: 'Datos usuario: ' + user.nickname,
+          pageName: 'user_view',
+          sessionUser: userLoged,
+          errors: errors,
+          user: user,
+          imageUrl: user.picture
+        })
+      })
+    })
+  }).catch(function (errors) {
+    res.send('(USERS.JS) ERROR en la busqueda. ' + errors)
+  })
 })
 
 // crear un usuario, para administradores
-router.get('/create')
+router.get('/create', function (req, res, next) {
+  res.render('users/user_create', {
+    pageTitle: 'Crear usuario',
+    pageName: 'dresses/create',
+    userLoged: null,
+    errors: null,
+    user: null
+  })
+})
 
 // crear un usuario, para administradores
-router.post('/create')
+router.post('/create', function (req, res, next) {
+  var user = {}
+  user.nickname = req.body.nickname
+  user.firstname = req.body.firstname
+  user.lastname = req.body.lastname
+  user.email = req.body.email
 
-module.exports = router;
+  db.User.create(user).then(function (userNew) {
+    res.render('users/user_create', {
+      pageTitle: 'Crear usuario',
+      pageName: 'dresses/create',
+      userLoged: null,
+      errors: null,
+      user: userNew
+    })
+  }).catch(function (errors) {
+    res.render('users/user_create', {
+      pageTitle: 'Crear usuario',
+      pageName: 'dresses/create',
+      userLoged: null,
+      errors: errors,
+      user: user
+    })
+  })
+})
+
+module.exports = router

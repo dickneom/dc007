@@ -16,6 +16,7 @@ cloudinary.config({
 var db = require('../models/db')
 var session = require('../controllers/session')
 var dresses = require('../controllers/dresses')
+var messages = require('../controllers/messages')
 
 router.use(function (req, res, next) {
   console.log('****** (global dresses) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
@@ -290,6 +291,7 @@ router.post('/create', session.sessionValidate, function (req, res, next) {
   dress.price = req.body.price
   dress.priceOriginal = req.body.priceOriginal
   dress.userId = req.session.userLoged.id
+  dress.image = 'http://res.cloudinary.com/cloud-dc/image/upload/v1487441736/brwltuenzajetyxciozo.png'
 
   db.Dress.create(dress)
   .then(function (dressNew) {
@@ -360,9 +362,10 @@ router.post('/images', session.sessionValidate, uploader.single('image'), dresse
     }).then(function (dress) {
       cloudinary.uploader.upload(req.file.path, function (result) {
         var fileUrl = result.url
-        var fileSecureUrl = result.secure_url
+        // var fileSecureUrl = result.secure_url
 
         dress.image = fileUrl
+        dress.stateId = 1
         console.log('********* Vestido a grabar: ' + dress)
 
         dress.save().then(function (dressNew) {
@@ -410,11 +413,79 @@ router.post('/publish', session.sessionValidate, dresses.isDressOwner, function 
       //  enviar mensaje al administrador
       //
       // res.send(req.session.urlGet)
+      var message = {}
+      message.date = new Date()
+      message.userIdFrom = req.session.userLoged.id
+      message.userIdTo = -1000
+      message.subject = 'Vestido publicado'
+      message.text = 'Vestido publicado'
+      message.url = '/dresses/' + dressId + '/update'
+
+      messages.messageInsert(message, function (error, messNew) {
+        if (error) {
+          console.log('Mensage no enviado.')
+        }
+      })
       res.redirect('/dresses/mycloset')
     })
   }).catch(function (errors) {
     console.log('(DRESSES.JS) Error en la busqueda del vestido.')
     res.send('(DRESSES.JS) Error en la busqueda del vestido.')
+  })
+})
+
+router.post('/forSaleAcept', function (req, res, next) {
+  var dressId = req.body.dressId
+
+  db.Dress.findOne({
+    where: {
+      id: dressId
+    }
+  }).then(function (dress) {
+    dress.update({stateId: 3})
+    var message = {}
+    message.date = new Date()
+    message.userIdFrom = -1000
+    message.userIdTo = dress.user.id
+    message.subject = 'Vestido aceptado'
+    message.text = 'Vestido aceptado'
+    message.url = '/dresses/' + dressId + '/update'
+
+    messages.messageInsert(message, function (error, messNew) {
+      if (error) {
+        console.log('Mensage no enviado.')
+      }
+    })
+  }).catch(function (errors) {
+    console.log('(DRESSES.JS) Error en busqueda el vestido: ' + errors)
+  })
+})
+
+router.post('/forSaleReject', function (req, res, next) {
+  var dressId = req.body.dressId
+
+  db.Dress.findOne({
+    where: {
+      id: dressId
+    }
+  }).then(function (dress) {
+    dress.update({stateId: 1})
+
+    var message = {}
+    message.date = new Date()
+    message.userIdFrom = -1000
+    message.userIdTo = dress.user.id
+    message.subject = 'Vestido rechazado'
+    message.text = 'Vestido rechazado'
+    message.url = '/dresses/' + dressId + '/update'
+
+    messages.messageInsert(message, function (error, messNew) {
+      if (error) {
+        console.log('Mensage no enviado.')
+      }
+    })
+  }).catch(function (errors) {
+    console.log('(DRESSES.JS) Error en busqueda el vestido: ' + errors)
   })
 })
 

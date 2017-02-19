@@ -46,7 +46,7 @@ mixin menu(name)
             if (pageName !== 'favorites')
               li: a(href='/favorites') Favoritos
             if (pageName !== 'profile')
-              li: a(href='/profile') Perfil
+              li: a(href='/users/profile') Perfil
           else
             if (pageName !== 'login')
               li: a(href='/login') Ingresar
@@ -59,10 +59,10 @@ mixin menu(name)
               li(role='presentation'): a(href='/dresses/admin' role='menuitem') Lista de Vestidos
               li.divider(role='presentation')
               li.dropdown-header(role='presentation') Usuario
-              li(role='presentation'): a(href='#' role='menuitem') Perfil
+              li(role='presentation'): a(href='/users/profile' role='menuitem') Perfil
               li(role='presentation'): a(href='/dresses/likes' role='menuitem') Favoritos
               li(role='presentation'): a(href='/dresses/mycloset' role='menuitem') Mi Closet
-              li(role='presentation'): a(href='#' role='menuitem') Mensajes
+              li(role='presentation'): a(href='/messages' role='menuitem') Mensajes
               li.divider(role='presentation')
               if name
                 li(role='presentation'): a(href="/logout" role='menuitem') Salir
@@ -167,7 +167,8 @@ mixin dresses_grid(dresses, numCols)
     each dress in dresses
       if (dress)
         .col-sm-4
-          img(src=dress.image width=120 height=150 alt=dress.image)
+          img(src=dress.image width=120 height=180 alt=dress.image)
+          p Imagen: #{dress.image}
           h2= dress.title
           p Descripcion: #{dress.description}
           p Marca: #{dress.brandId}

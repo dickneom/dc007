@@ -13,17 +13,22 @@ block content
   .container
     if users
       each user in users
-        p
-          | #{user.id}
-          | - #{user.nickname}
-          | - #{user.firstname}
-          | - #{user.lastname}
-          | - #{user.email}
-          | - #{user.authenticated}
-          | - #{user.isAdmin}
-        a(href='/users/' + user.id) Ver
-        a(href='/users/' + user.id + '/update') Actualizar
-        a(href='/users/' + user.id + '/images') Foto
+        .row
+          .col-sm-1
+            img(src=user.picture width=60 height=60 alt=user.picture)
+          .col-sm-7
+            p
+              | #{user.id}
+              | - #{user.nickname}
+              | - #{user.firstname}
+              | - #{user.lastname}
+              | - #{user.email}
+              | - #{user.authenticated}
+              | - #{user.isAdmin}
+          .col-sm-4
+            a(href='/users/' + user.id) Ver
+            a(href='/users/' + user.id + '/update') Actualizar
+            a(href='/users/' + user.id + '/images') Foto
 
   .container
     ul.nav.navbar-nav

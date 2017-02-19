@@ -18,15 +18,28 @@ db.sequelize = sequelize
 // Modelos - Tablas
 db.User = require('./users')(sequelize, Sequelize)
 db.Dress = require('./dresses')(sequelize, Sequelize)
+db.Message = require('./messages')(sequelize, Sequelize)
 
 // Relaciones
 db.User.hasMany(db.Dress, {
-	foreignKey: 'user_id',
+	foreignKey: 'userId',
 	as: 'dress'
 })
 db.Dress.belongsTo(db.User, {
-	foreignKey: 'user_id',
+	foreignKey: 'userId',
 	as: 'user'
+})
+db.Message.belongsTo(db.User, {
+  foreignKey: 'userIdTo',
+  as: 'userTo'
+})
+db.Message.belongsTo(db.User, {
+  foreignKey: 'userIdFrom',
+  as: 'userFrom'
+})
+db.User.hasMany(db.Message, {
+  foreignKey: 'userIdTo',
+  as: 'userTo'
 })
 
 module.exports = db

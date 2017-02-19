@@ -1,0 +1,34 @@
+extends ../layout
+include ../mixins
+
+block content
+	if (sessionUser)
+		if (sessionUser.nickname)
+			+menu(sessionUser.nickname)
+		else
+			+menu(sessionUser.fullname)
+	else
+		+menu(null)
+
+	.container
+		h1 Ver un mensaje
+		.row
+			.col-sm-9
+				.row
+					.col-sm-6
+						if message
+							h3= message.subject
+							p De: #{message.userFrom.nickname}
+							p Para: #{message.userTo.nickname}
+							p Fecha: #{message.date}
+							p Texto: #{message.text}
+
+							//-						if sessionUser
+														a(href='/dresses/' + dress.id + '/like'): button(type='button') Agregar Favorito
+														a(href='/dresses/' + dress.id + '/buy'): button(type='button') Comprar
+														a(href='/dresses/' + dress.id + '/edit'): button(type='button') Editar
+
+			.col-md-3
+				p Publicidad
+
+	+foot

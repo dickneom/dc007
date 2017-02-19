@@ -13,6 +13,7 @@ var register = require('./routes/register')
 var passRecover = require('./routes/pass_recover')
 var dresses = require('./routes/dresses')
 var users = require('./routes/users')
+var messages = require('./routes/messages')
 
 var session = expressSession({
   secret: 'lkjsfffws',
@@ -47,6 +48,7 @@ app.use('/register', register)
 app.use('/pass_recover', passRecover)
 app.use('/dresses', dresses)
 app.use('/users', users)
+app.use('/messages', messages)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -1,0 +1,32 @@
+extends ../layout
+include ../mixins
+
+block content
+  if userLoged
+    if userLoged.fullname
+      +menu(userLoged.fullname)
+    else
+      +menu(userLoged.nickname)
+  else
+    +menu(null)
+
+  h1 Crear usuario
+
+  form(method='post' action='/users/create')
+    if user
+    else
+      +input_readonly('ID usuario', 'text', 'userId', null, null)
+      br
+      +input('Alias', 'text', 'nickname', null, null)
+      br
+      +input_required('Nombre', 'text', 'firstname', null, null)
+      br
+      +input_required('Apellido', 'text', 'lastname', null, null)
+      br
+      +input_required('Email', 'email', 'email', null, null)
+      br
+      button(type='submit') Grabar
+
+
+
+  +foot

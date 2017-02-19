@@ -26,6 +26,7 @@ router.route('/')
 		user.email = req.body.email
 		user.birthdate = req.body.birthdate
 		user.password = req.body.password
+		user.picture = 'http://res.cloudinary.com/cloud-dc/image/upload/v1487441736/brwltuenzajetyxciozo.png'
 
 		var pass = req.body.password1
 		var clavesIguales = true
