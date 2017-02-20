@@ -419,7 +419,7 @@ router.post('/publish', session.sessionValidate, dresses.isDressOwner, function 
       message.userIdTo = -1000
       message.subject = 'Vestido publicado'
       message.text = 'Vestido publicado'
-      message.url = '/dresses/' + dressId + '/update'
+      message.urlTo = '/dresses/' + dressId + '/update'
 
       messages.messageInsert(message, function (error, messNew) {
         if (error) {

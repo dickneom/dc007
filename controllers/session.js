@@ -79,13 +79,68 @@ function isAuthenticatedUser (user, next) {
   }
 }
 
-// Verifica que el usuario este autenticado
+// Verifica que el usuario logeado es administrador
 function isAdmin (req, res, next) {
   if (req.session.userLoged.admin) {
     next()
   } else {
-    return new Error('Usuario no es administrador.')
+    return new Error('(SESSION.JS) Usuario no es administrador.')
   }
+}
+
+// Verificar si el usuario logeado y el usuario editado son los mismos
+function isSelf (req, res, next) {
+  var userLogedId = req.session.userLoged.id
+
+  console.log('(SESSION.JS) id del usuario como parámetro')
+  var userId = req.params.userId
+  if (!userId) {
+    if (req.method === 'GET') {
+      console.log('(SESSION.JS) id del usuario para metodo GET')
+      userId = req.query.userId
+    } else {
+      console.log('(SESSION.JS) id del usuario para metodo POST')
+      userId = req.body.userId
+    }
+  }
+  userLogedId = parseInt(userLogedId, 10)
+  userId = parseInt(userId, 10)
+  console.log('(SESSION.JS) userLogedId: ' + userLogedId + ' - userId: ' + userId)
+  console.log('(SESSION.JS) userLogedId === userId: ', userLogedId === userId)
+  if (userLogedId === userId) {
+    next()
+  } else {
+    res.send('(SESSION.JS) No está autorizado para hacer esto (no es el propietario).')
+  }
+}
+
+// Verifica si el usuario logeado es el mismo usuario editado o si es administrador
+function isSelfOrAdmin (req, res, next) {
+  if (req.session.userLoged.isAdmin) {
+    next()
+  }
+
+  var userLogedId = req.session.userLoged.id
+
+  console.log('(SESSION.JS) id del usuario como parámetro')
+  var userId = req.params.userId
+  if (!userId) {
+    if (req.method === 'GET') {
+      console.log('(SESSION.JS) id del usuario para metodo GET')
+      userId = req.query.userId
+    } else {
+      console.log('(SESSION.JS) id del usuario para metodo POST')
+      userId = req.body.userId
+    }
+  }
+
+  userLogedId = parseInt(userLogedId, 10)
+  userId = parseInt(userId, 10)
+  if (userLogedId === userId) {
+    next()
+  }
+
+  res.send('(SESSION.JS) No está autorizado para hacer esto (no es propietario ni administrador).')
 }
 
 module.exports.login = login
@@ -94,3 +149,5 @@ module.exports.sessionInit = sessionInit
 module.exports.sessionValidate = sessionValidate
 module.exports.sessionDestroy = sessionDestroy
 module.exports.isAdmin = isAdmin
+module.exports.isSelf = isSelf
+module.exports.isSelfOrAdmin = isSelfOrAdmin

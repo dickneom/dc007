@@ -15,15 +15,17 @@ block content
   if messages
     each mess in messages
       if !mess.isRead
-        p.strong
+        h3
           | #{mess.date}
           |  - #{mess.subject}
           |  - #{mess.text}
+          |  - #{mess.url}
       else
         p
           | #{mess.date}
           |  - #{mess.subject}
           |  - #{mess.text}
+          |  - #{mess.url}
 
       a(href='/messages/' + mess.id) Ver
 

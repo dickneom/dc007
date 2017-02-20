@@ -93,7 +93,7 @@ router.get('/profile', session.sessionValidate, function (req, res, next) {
 })
 
 // ver los datos de un usuario, para propietario y administradores
-router.get('/:userId([0-9]+)', function (req, res, next) {
+router.get('/:userId([0-9]+)', session.sessionValidate, function (req, res, next) {
   console.log('(USERS.JS) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
   var userId = req.params.userId
 
@@ -120,7 +120,7 @@ router.get('/:userId([0-9]+)', function (req, res, next) {
 })
 
 // Actuzalizar los datos de un usuario, para propietario y administradores
-router.get('/:userId([0-9]+)/update', function (req, res, next) {
+router.get('/:userId([0-9]+)/update', session.sessionValidate, session.isSelf, function (req, res, next) {
   console.log('(USERS.JS) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
   var userId = req.params.userId
 
@@ -150,7 +150,7 @@ router.get('/:userId([0-9]+)/update', function (req, res, next) {
 })
 
 // Actualizar los datos de un usuario, para propietario y administradores
-router.post('/update', function (req, res, next) {
+router.post('/update', session.sessionValidate, session.isSelf, function (req, res, next) {
   console.log('(USERS.JS) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
 
   var userId = req.body.userId
@@ -192,7 +192,7 @@ router.post('/update', function (req, res, next) {
 })
 
 // Subir la imagen de un usuario, para propietarios
-router.get('/:userId([0-9]+)/images', function (req, res, next) {
+router.get('/:userId([0-9]+)/images', session.sessionValidate, session.isSelf, function (req, res, next) {
   console.log('(USERS.JS) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
   var userId = req.params.userId
 
@@ -223,7 +223,7 @@ router.get('/:userId([0-9]+)/images', function (req, res, next) {
 })
 
 // subir la imagen de un usuario, para propietarios
-router.post('/images', uploader.single('image'), function (req, res, next) {
+router.post('/images', session.sessionValidate, uploader.single('image'), session.isSelf, function (req, res, next) {
   console.log('(USERS.JS) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
 
   var userId = req.body.userId
@@ -300,6 +300,52 @@ router.post('/create', function (req, res, next) {
       userLoged: null,
       errors: errors,
       user: user
+    })
+  })
+})
+
+router.get('/pass_change', function (req, res, next) {
+  res.render('users/user_pass_change', {
+    pageTitle: 'Cambio de contraseña',
+    pageName: 'user_pass_change',
+    sessionUser: req.session.userLoged,
+    errors: null
+  })
+})
+
+router.post('/pass_change', function (req, res, next) {
+  var userId = req.session.userLoged.id
+  var passOld = session.encryptPassword(req.body.passOld)
+  var pass1 = req.body.pass1
+  var pass2 = req.body.pass2
+
+  var error
+  db.User.findOne({
+    where: {
+      id: userId,
+      password: passOld
+    }
+  }).then(function (user) {
+    if (pass1 !== pass2) {
+      error = 'Los contraseñas no coinciden.'
+      res.render('users/user_pass_change', {
+        pageTitle: 'Cambio de contraseña',
+        pageName: 'user_pass_change',
+        sessionUser: req.session.userLoged,
+        errors: [error]
+      })
+    } else {
+      user.update({password: pass1}).thne(function (user) {
+        res.send('Contraseña cambiada correctamente!')
+      })
+    }
+  }).catch(function (errors) {
+    error = 'Contraseña incorrecta.'
+    res.render('users/user_pass_change', {
+      pageTitle: 'Cambio de contraseña',
+      pageName: 'user_pass_change',
+      sessionUser: req.session.userLoged,
+      errors: [error]
     })
   })
 })

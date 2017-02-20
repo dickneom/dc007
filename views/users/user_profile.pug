@@ -22,9 +22,9 @@ block content
       p= user.authenticated
       p= user.isAdmin
   .row
-    a(href='#') Cambiar foto
-    a(href='#') Cambiar clave
-    a(href='#') Editar datos
+    a(href='/users/' + sessionUser.id + '/images') Cambiar foto
+    a(href='/users/pass_change') Cambiar clave
+    a(href='/users/' + sessionUser.id + '/update') Editar datos
 
 
   +foot

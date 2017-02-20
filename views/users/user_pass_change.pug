@@ -1,0 +1,30 @@
+extends ../layout
+include ../mixins
+
+block content
+  if sessionUser
+    if sessionUser.nickname
+      +menu(sessionUser.nickname)
+    else
+      +menu(sessionUser.fullname)
+  else
+    +menu(null)
+
+  .row
+    if errors
+      each error in errors
+        p.error #{error}
+  .row
+    .col-sm-6
+      form(method='post' action='/users/pass_change')
+        +input_readonly('Id Usuario', 'text', 'userId', sessionUser.id, null)
+        br
+        +input_required('Contraseña Anterior', 'passOld', '', errors)
+        br
+        +input_required('Contraseña', 'password', 'pass1', '', errors)
+        br
+        +input_required('Contraseña', 'password', 'pass2', '', errors)
+        br
+        button(type='submit') Grabar
+
+  +foot
