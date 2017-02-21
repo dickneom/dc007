@@ -1,7 +1,7 @@
 // /models/Wishs.js
 
 module.exports = function (sequelize, DataTypes) {
-  var Wish = sequelize.define('Wish', {
+  var Like = sequelize.define('Like', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -54,11 +54,11 @@ module.exports = function (sequelize, DataTypes) {
       field: 'deleted_at'
     }
   }, {
-    tableName: 'dresses_Wishs',
+    tableName: 'dresses_Likes',
     timestamp: true,
     paranoid: true
     // aqui faltan las relaciones
   })
 
-  return Wish
+  return Like
 }

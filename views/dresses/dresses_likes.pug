@@ -11,11 +11,12 @@ block content
     +menu(null)
     
   .container
-    h1 Mi Closet
-    a(href='/dresses/create') Agregar Vestido
+    h1 Favoritos
 
   .container
-    +dresses_grid(dresses)
+    if likes
+      each like in likes
+        p= like.dress.title
 
   div
     .container

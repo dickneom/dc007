@@ -19,7 +19,7 @@ db.sequelize = sequelize
 db.User = require('./users')(sequelize, Sequelize)
 db.Dress = require('./dresses')(sequelize, Sequelize)
 db.Message = require('./messages')(sequelize, Sequelize)
-db.Wish = require('./wish')(sequelize, Sequelize)
+db.Like = require('./wish')(sequelize, Sequelize)
 
 // Relaciones
 // Dress* - User1
@@ -49,24 +49,24 @@ db.User.hasMany(db.Message, {
   as: 'userTo'
 })
 
-// Dress1 - Wish*
-db.Dress.hasMany(db.Wish, {
+// Dress1 - Like*
+db.Dress.hasMany(db.Like, {
   foreignKey: 'dressId',
-  as: 'wishs'
+  as: 'Likes'
 })
 
-db.Wish.belongsTo(db.Dress, {
+db.Like.belongsTo(db.Dress, {
   foreignKey: 'dressId',
   as: 'dress'
 })
 
-// User1 - Wish*
-db.User.hasMany(db.Wish, {
+// User1 - Like*
+db.User.hasMany(db.Like, {
   foreignKey: 'userId',
-  as: 'wishs'
+  as: 'Likes'
 })
 
-/* db.Wish.belongsTo(db.USer, {
+/* db.Like.belongsTo(db.USer, {
   foreignKey: 'userId',
   as: 'user'
 }) */

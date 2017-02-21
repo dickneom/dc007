@@ -191,7 +191,7 @@ mixin dresses_grid(dresses, numCols)
               form(method='post' action='/dresses/publish')
                 +input_readonly('ID vestido', 'hidden', 'dressId', dress.id, null)
                 button(type='submit') Retirar
-          if (pageName === 'dresses')
+          if (pageName === 'dresses' && sessionUser.isAdmin)
             a(href='/dresses/' + dress.id + '/like'): button(type='button') Agregar Favorito
             a(href='/dresses/' + dress.id + '/buy'): button(type='button') Comprar
           if (dress.stateId === 2)

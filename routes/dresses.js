@@ -92,7 +92,7 @@ router.get('/', function (req, res, next) {
     }
     res.render('dresses/dresses', {
       pageTitle: 'Lista de vestidos',
-      pafeName: 'dresses',
+      pageName: 'dresses',
       sessionUser: sessionUser,
       errors: null,
       dresses: dresses,
@@ -142,6 +142,27 @@ router.get('/:dressId([0-9]+)', function (req, res, next) {
 router.get('/likes', session.sessionValidate, function (req, res, next) {
   console.log('*** ATENDIENDO LA RUTA: /dresses/likes GET')
 
+  var userId = req.session.userLoged.id
+
+  db.Like.findAll({
+    where: {
+      userId: userId
+    },
+    include: {
+      model: db.Dress,
+      as: 'dress'
+    }
+  }).then(function (likes) {
+    res.render('dresses/dresses_likes', {
+      pageTitle: 'Favoritos',
+      pageName: 'dresses_likes',
+      sessionUser: userId,
+      errors: null,
+      likes: likes
+    })
+  }).catch(function (errors) {
+    res.send('(DRESSES.JS ERROR en la busqueda de los favoritos (likes)')
+  })
 })
 
 // Agregar un vestido a favoritos
@@ -158,7 +179,7 @@ router.get('/:dressId/like', session.sessionValidate, function (req, res, next) 
   db.Like.create(like).then(function (likeNew) {
     res.redirect(req.session.urlGet)
   }).catch(function (errors) {
-    res.send('(DRESSES.JS) Error al insertar el like')
+    //- res.send('(DRESSES.JS) Error al insertar el like')
   })
 })
 
@@ -177,7 +198,7 @@ router.get('/:dressId/dislike', function (req, res, next) {
   }).then(function (like) {
     like.update({idDeleted: true}.then(function (dressNew) {
       like.destroy().then(function () {
-        res.redirect(req.session.urlGet)
+        //- res.redirect(req.session.urlGet)
       })
     }))
   }).catch(function (errors) {
