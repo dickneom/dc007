@@ -46,7 +46,7 @@ router.get('/', session.sessionValidate, function (req, res, next) {
   })
 })
 
-router.get('/:messageId', function (req, res, next) {
+router.get('/:messageId', session.sessionValidate, , function (req, res, next) {
   console.log('****** (MESSAGES.JS) ATENDIENDO LA RUTA: ' + req.url + ' METODO: ' + req.method)
 
   var messageId = req.params.messageId

@@ -139,8 +139,51 @@ router.get('/:dressId([0-9]+)', function (req, res, next) {
 // RUTAS PARA USUARIOS REGISTRADOS
 
 // Lista de los vestidos favoritos
+router.get('/likes', session.sessionValidate, function (req, res, next) {
+  console.log('*** ATENDIENDO LA RUTA: /dresses/likes GET')
+
+})
+
 // Agregar un vestido a favoritos
+router.get('/:dressId/like', session.sessionValidate, function (req, res, next) {
+  console.log('*** ATENDIENDO LA RUTA: /dresses/:dressId/like GET')
+  var dressId = req.params.dressId
+  var userId = req.session.userLoged.id
+
+  var like = {}
+  like.dressId = dressId
+  like.userId = userId
+  like.date = new Date()
+
+  db.Like.create(like).then(function (likeNew) {
+    res.redirect(req.session.urlGet)
+  }).catch(function (errors) {
+    res.send('(DRESSES.JS) Error al insertar el like')
+  })
+})
+
 // Quitar un vestido de favoritos
+
+router.get('/:dressId/dislike', function (req, res, next) {
+  console.log('*** ATENDIENDO LA RUTA: /dresses/:dressId/dislike GET')
+  var dressId = req.params.dressId
+  var userId = req.session.userLoged.id
+
+  db.Like.findOne({
+    where: {
+      userId: userId,
+      dressId: dressId
+    }
+  }).then(function (like) {
+    like.update({idDeleted: true}.then(function (dressNew) {
+      like.destroy().then(function () {
+        res.redirect(req.session.urlGet)
+      })
+    }))
+  }).catch(function (errors) {
+    res.send('(DRESSES.JS) ERROR en la busqueda')
+  })
+})
 // Comprar un vestido
 // Cancelar una compra
 
@@ -442,19 +485,24 @@ router.post('/forSaleAcept', function (req, res, next) {
       id: dressId
     }
   }).then(function (dress) {
-    dress.update({stateId: 3})
-    var message = {}
-    message.date = new Date()
-    message.userIdFrom = -1000
-    message.userIdTo = dress.user.id
-    message.subject = 'Vestido aceptado'
-    message.text = 'Vestido aceptado'
-    message.url = '/dresses/' + dressId + '/update'
+    dress.update({stateId: 3}).then(function (dressNew) {
+      //
+      // Enviar mensaje al propietario
+      //
 
-    messages.messageInsert(message, function (error, messNew) {
-      if (error) {
-        console.log('Mensage no enviado.')
-      }
+      var message = {}
+      message.date = new Date()
+      message.userIdFrom = -1000
+      message.userIdTo = dress.user.id
+      message.subject = 'Vestido aceptado'
+      message.text = 'Vestido aceptado'
+      message.url = '/dresses/' + dressId + '/update'
+
+      messages.messageInsert(message, function (error, messNew) {
+        if (error) {
+          console.log('Mensage no enviado.')
+        }
+      })
     })
   }).catch(function (errors) {
     console.log('(DRESSES.JS) Error en busqueda el vestido: ' + errors)
@@ -469,20 +517,24 @@ router.post('/forSaleReject', function (req, res, next) {
       id: dressId
     }
   }).then(function (dress) {
-    dress.update({stateId: 1})
+    dress.update({stateId: 1}, function (dressNew) {
+      //
+      // Enviar mensaje al propietario
+      //
 
-    var message = {}
-    message.date = new Date()
-    message.userIdFrom = -1000
-    message.userIdTo = dress.user.id
-    message.subject = 'Vestido rechazado'
-    message.text = 'Vestido rechazado'
-    message.url = '/dresses/' + dressId + '/update'
+      var message = {}
+      message.date = new Date()
+      message.userIdFrom = -1000
+      message.userIdTo = dress.user.id
+      message.subject = 'Vestido rechazado'
+      message.text = 'Vestido rechazado'
+      message.url = '/dresses/' + dressId + '/update'
 
-    messages.messageInsert(message, function (error, messNew) {
-      if (error) {
-        console.log('Mensage no enviado.')
-      }
+      messages.messageInsert(message, function (error, messNew) {
+        if (error) {
+          console.log('Mensage no enviado.')
+        }
+      })
     })
   }).catch(function (errors) {
     console.log('(DRESSES.JS) Error en busqueda el vestido: ' + errors)
